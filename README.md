@@ -10,6 +10,8 @@ Send message with address and payload structure
 Haven't implemtented JSON yet.
 
 Functions:
+
+
 1. Turn on the air conditioner and send picture and text back by mail
 
 2. Turn on the led light remotely (analog and digital)
