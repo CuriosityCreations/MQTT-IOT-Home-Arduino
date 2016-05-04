@@ -1,0 +1,355 @@
+<html>
+<head>
+  <title>Smart Home_MQTT</title>
+  <link rel="shortcut icon" href="favicon-20160330092929929.ico" />
+  <link rel="apple-touch-icon" href="ICON.png"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="slider.css">
+  <script src="browserMqtt.js"></script>
+  <script src="smoothie.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container" align="center" style="margin-top:20px;">
+	<div class="page-header">
+      <h1>IOT Smart Home</h1>      
+    </div>
+  <div class="row" style="margin-bottom:20px;">
+    <div class="col-xs-12" >
+      <div style="float:left;width:25%;background-color:Lavender;" >
+        <input type="hidden" name="pin" value="0" id="pin18"/>
+        <input type="hidden" name="action" value="0" id="action12"  />
+        <img src="off.png" width="60" style="margin-top:10px;" id="image18" onclick="sendbutton(18)" />
+        <p style="font-size:9px;"> Air Conditioner</p>
+      </div>
+      <div style="float:left;width:25%;background-color:LavenderBlush ">
+        <input type="hidden" name="pin" value="0" id="SPI" />
+        <input type="hidden" name="action" value="0" id="actionSPI" />
+        <img src="off.png" width="60" style="margin-top:10px" id="imageSPI" onclick="sendbutton(20)" />
+        <p style="font-size:9px;">Smart Vision</p>
+      </div>
+      <div style="float:left;width:25%;background-color:Lavender ">
+     	<input type="hidden" name="pin" value="0" id="pin19" />
+        <input type="hidden" name="action" value="0" id="action13" />
+        <img src="off.png" width="60" style="margin-top:10px" id="image19" onclick="sendbutton(19)"/>
+        <p style="font-size:9px;">LED Light</p>
+      </div>
+      <div style="float:left;width:25%;background-color:LavenderBlush ">
+        <input type="hidden" name="pin" value="0" id="pin13" />
+        <input type="hidden" name="action" value="0" id="action11" />
+        <img src="off.png" width="60" style="margin-top:10px" id="image13" onclick="sendbutton(13)"/>
+        <p style="font-size:9px;">Safe Bell</p>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-bottom:10px;"> 
+     <div class="col-sm-4" align="center"  style="margin-bottom:10px;">
+      <div class="well-sm" style="background-color:lightblue; ">
+	    <h4>Temperature : <span id="analog0">-</span>℃</h4>
+	  </div>
+    </div>
+    <div class="col-sm-4" align="center">
+      <div class="well-sm" style="background-color:lightblue;margin-bottom:10px;">
+	    <h4>Humidity : <span id="analog1">-</span>%</h4>
+	  </div>
+    </div>
+	<div class="col-sm-4" align="center">
+      <div class="well-sm" style="background-color:lightblue;margin-bottom:10px;">
+	    <h4>WIFI Quality : <span id="analog2">-</span>%</h4>
+	  </div>
+    </div>
+  </div>
+  <div class="row" style="margin-bottom:15px;">
+     <div class="col-sm-6"  align="center">
+       <canvas id="mycanvas" width="270" height="125" style="margin-bottom:5px;"></canvas>
+	   </div>
+     <div class="col-sm-6"  align="center">
+	   <canvas id="mycanvas2" width="270" height="125"></canvas>
+     </div>
+  </div>
+  <div class="row" style="margin-bottom:10px;">
+  <div class="col-sm-4"  align="center">
+    <div class="well-sm" style="background-color:aquamarine; margin-bottom:10px;">
+      <h4>Lamp:  <span id="demo1"> - </span></h4>
+	  <input type="range" id="myRange" value="0" step="1" max="10" oninput="myFunction1()" style="margin-bottom:10px;">
+    </div>
+  </div>
+  <div class="col-sm-4" align="center">
+    <div class="well-sm" style="background-color:aquamarine; margin-bottom:10px;">
+      <h4>RobotX: <span id="demo2">- </span></h4>
+	  <input type="range" id="myRange2" value="500" step="50" max="800"  min="200" oninput="myFunction2()" style="margin-bottom:10px;">
+    </div>
+  </div>
+  <div class="col-sm-4"  align="center">
+    <div class="well-sm" style="background-color:aquamarine; margin-bottom:10px;">
+      <h4>RobotY: <span id="demo3" >- </span></h4>
+	 <input type="range" id="myRange3" value="500" step="50" max="800" min="200" oninput="myFunction3()" style="margin-bottom:10px;">
+    </div>
+  </div>
+ </div>
+ <div class="row">
+ <div class="col-sm-6"  align="center">
+ <div class="well-sm" style="background-color:lightblue; margin-bottom:10px;">
+ <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo"style="margin-bottom:10px;" >Air Live Stream</button>
+ <div id="demo" class="collapse">
+<img src="http://112.104.75.28:8080/?action=stream"  class="img-thumbnail" class="img-responsive"  width="320" height="240"/>
+ </div>
+ 
+ </div>
+ </div>
+ <div class="col-sm-6"  align="center">
+ <div class="well-sm" >
+ </div>
+ </div>
+ 
+ </div>
+
+ </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function(){
+  		
+ //Get the canvas & context
+var c = $('#mycanvas');
+var d = $('#mycanvas2');
+var ct = c.get(0).getContext('2d');
+var container = $(c).parent();
+  		
+//Run function when browser  resize
+$(window).resize( respondCanvas );
+	  	
+function respondCanvas(){
+  c.attr('width', $(container).width() ); //max width
+  d.attr('width', $(container).width() ); //max width
+}
+//Initial call
+respondCanvas();
+});
+</script>
+<script>
+analog0 = document.getElementById('analog0');
+analog1 = document.getElementById('analog1');
+digital0 = document.getElementById('image18');
+digital1 = document.getElementById('image19');
+digital2 = document.getElementById('imageSPI');
+digital3 = document.getElementById('image13');
+Dstatus0 = document.getElementById('pin18');
+Dstatus1 = document.getElementById('pin19');
+Dstatus2 = document.getElementById('SPI');
+Dstatus3 = document.getElementById('pin13');
+range1 = document.getElementById("myRange");
+range2 = document.getElementById("myRange2");
+range3 = document.getElementById("myRange3");
+statusRange1 = document.getElementById("demo1");
+statusRange2 = document.getElementById("demo2");
+statusRange3 = document.getElementById("demo3");
+
+function myFunction1() {
+	x = document.getElementById("myRange").value;
+	sendbutton(30);
+	//range1.value = x;
+	//document.getElementById("demo1").innerHTML = x;
+}
+
+function myFunction2() {
+	y = document.getElementById("myRange2").value;
+	sendbutton(31);
+	//range1.value = x;
+	//document.getElementById("demo1").innerHTML = x;
+}
+
+function myFunction3() {
+	z = document.getElementById("myRange3").value;
+	sendbutton(32);
+	//range1.value = x;
+	//document.getElementById("demo1").innerHTML = x;
+}
+
+function sendbutton(port){
+	switch (port) {
+		case 18:
+			client.publish("room1/ctrl_AIR", "switch");
+		    if (Dstatus0.value == "1"){
+			   client.publish("room1/ctrl_AIR", "0");
+			   digital0.src = "off.png";
+			   Dstatus0.value = "0";
+			}else if (Dstatus0.value == "0"){
+			   client.publish("room1/ctrl_AIR", "1");
+			   digital0.src = "on.png";
+			   Dstatus0.value = "1";
+			}
+			break;
+		case 19:
+		    var tempLED = digital1.src;
+			client.publish("room1/ctrl_LED", "switch");
+			if (Dstatus1.value == "1"){
+			   client.publish("room1/ctrl_LED", "0");
+			   digital1.src = "off.png";
+			   Dstatus1.value = "0";
+			}else if (Dstatus1.value == "0") {
+			   client.publish("room1/ctrl_LED", "1");
+			   digital1.src = "on.png";
+			   Dstatus1.value = "1";
+			}
+			break;
+		case 13:
+		    var tempBELL = digital3.src;
+			client.publish("room1/ctrl_SAFEBELL", "switch");
+			if (Dstatus3.value == "1"){
+			   client.publish("room1/ctrl_SAFEBELL", "0");
+			   digital3.src = "off.png";
+			   Dstatus3.value = "0";
+			}else if (Dstatus3.value == "0"){
+			   client.publish("room1/ctrl_SAFEBELL", "1");
+			   digital3.src = "on.png";
+			   Dstatus3.value = "1";
+			}
+			break;
+		case 20:
+		    var tempVISION = digital2.src;
+			client.publish("room1/ctrl_SMARTVISION", "switch");
+			if (Dstatus2.value == "1"){
+			   client.publish("room1/ctrl_SMARTVISION", "0");
+			   digital2.src = "off.png";
+			   Dstatus2.value = "0";
+			   range2.value = "500"
+			   range3.value = "500"
+			}else if (Dstatus2.value == "0"){
+			   client.publish("room1/ctrl_SMARTVISION", "1");
+			   digital2.src = "on.png";
+			   Dstatus2.value = "1";
+			   range2.value = "500";
+			   range3.value = "500"
+			}
+			break;
+	    case 30:
+		    client.publish("room1/ctrl_LAMP", String(x));
+			break;
+	    case 31:
+		    client.publish("room1/ctrl_ROBOTX", String(y));
+		    break;
+		case 32:
+			client.publish("room1/ctrl_ROBOTY", String(z));
+		    break;
+		default:
+		    break;
+	}
+}
+
+var line0 = new TimeSeries();
+var line1 = new TimeSeries();
+var line2 = new TimeSeries();
+
+var client = mqtt.connect('mqtt://36f92922:6587a1b1f2244682@broker.shiftr.io', {
+  clientId: 'javascript'
+});
+  client.publish("room1/ctrl_WEBFLASH", "flash");
+  client.subscribe("room1/humid");
+  client.subscribe("room1/temp");
+  client.subscribe("room1/WIFI");
+  client.subscribe("room1/ctrl_LED");
+  client.subscribe("room1/ctrl_SAFEBELL");
+  client.subscribe("room1/ctrl_AIR");
+  client.subscribe("room1/ctrl_SMARTVISION");
+  client.subscribe("room1/ctrl_LAMP");
+  client.subscribe("room1/ctrl_ROBOTX");
+  client.subscribe("room1/ctrl_ROBOTY");
+  client.subscribe("room1/json");
+  
+  client.on("message", function(topic, payload) {
+	
+	if (topic == "room1/temp"){
+	    //humid = payload;
+		analog0.innerHTML = payload;
+		line0.append(new Date().getTime(), payload);
+	}else if (topic == "room1/humid"){
+	    //temp = payload;
+		analog1.innerHTML = payload;
+		line1.append(new Date().getTime(), payload);
+	}else if (topic == "room1/WIFI"){
+	    //temp = payload;
+		analog2.innerHTML = payload;
+		line2.append(new Date().getTime(), payload);
+	} else if (topic == "room1/ctrl_LED"){
+	   if (payload == 1){
+	      digital1.src = "on.png";
+		  //Dstatus1.value = "1";
+	   }else if (payload == 0){
+	      digital1.src = "off.png";
+		  //Dstatus1.value = "0";
+	   }
+	} else if (topic == "room1/ctrl_AIR"){
+	   if (payload == 1){
+	      digital0.src = "on.png";
+		  //Dstatus0.value = "1";
+	   }else if (payload == 0){
+	       digital0.src = "off.png";
+		  //Dstatus0.value = "0";
+	   }
+	} else if (topic == "room1/ctrl_SMARTVISION"){
+	   if (payload == 1){
+	      digital2.src = "on.png";
+		  //Dstatus2.value = "1";
+	   }else if (payload == 0){
+	      digital2.src = "off.png";
+		  //Dstatus2.value = "0";
+	   }
+	} else if (topic == "room1/ctrl_SAFEBELL"){
+	   if (payload == 1){
+	      digital3.src = "on.png";
+		  //Dstatus3.value = "1";
+	   }else if (payload == 0){
+	      digital3.src = "off.png";
+		  //Dstatus3.value = "0";
+	   }
+	} else if (topic == "room1/ctrl_LAMP"){
+	    //range1.value = payload;
+		statusRange1.innerHTML=payload;
+	} else if (topic == "room1/ctrl_ROBOTX"){
+	    //range1.value = payload;
+		statusRange2.innerHTML=payload;
+	} else if (topic == "room1/ctrl_ROBOTY"){
+	    //range1.value = payload;
+		statusRange3.innerHTML=payload;
+	}
+	
+  });
+
+var smoothie1 = new SmoothieChart({
+			                        millisPerPixel:50,
+			                        grid: {strokeStyle: 'rgba(187, 174, 9, 0.35)',
+                                    fillStyle: 'rgb(0, 0, 50)',
+                                    lineWidth: 1,
+                                    millisPerLine: 4000,
+                                    verticalSections: 10},
+                                    minValue: 8,
+                                    maxValue: 38,
+                                    //resetBounds: false,
+                                    //interpolation: "line"
+                                    });
+//smoothie2.addTimeSeries(line0, { strokeStyle: 'rgb(0, 255, 0)', lineWidth: 3 });
+smoothie1.addTimeSeries(line0, { strokeStyle: 'rgb(221, 160, 221)', lineWidth: 3 });
+smoothie1.streamTo(document.getElementById("mycanvas"), 5000);
+
+var smoothie2 = new SmoothieChart({
+			                        millisPerPixel:50,
+			                        grid: {strokeStyle: 'rgba(187, 174, 9, 0.35)',
+                                    fillStyle: 'rgb(0, 0, 50)',
+                                    lineWidth: 1,
+                                    millisPerLine: 4000,
+                                    verticalSections: 10},
+                                    minValue: 35,
+                                    maxValue: 85,
+                                    //resetBounds: false,
+                                    //interpolation: "line"
+                                    });
+//smoothie2.addTimeSeries(line0, { strokeStyle: 'rgb(0, 255, 0)', lineWidth: 3 });
+smoothie2.addTimeSeries(line1, { strokeStyle: 'rgb(175, 238, 238)', lineWidth: 3 });
+smoothie2.streamTo(document.getElementById("mycanvas2"), 5000);
+</script>
+</body>
+</html>
