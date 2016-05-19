@@ -7,7 +7,7 @@ MQTT IOT Home for Arduino Yun
 Code includes JS, Arduino C, Python
 
 
-Descriptions:
+#Descriptions:
 
 
 Connect to Shiftr.io MQTT broker
@@ -19,7 +19,7 @@ Send message with address and payload structure
 Haven't implemtented JSON yet.
 
 
-Notes:
+#Notes:
 
 
 Put wifi-info.lua into /usr/bin
@@ -31,7 +31,7 @@ chmod /usr/bin/wifi-info.lua 755
 Put mail.py into /mnt/sda1
 
 
-Functions:
+#Functions:
 
 
 1. Turn on the air conditioner and send picture and text back by mail
