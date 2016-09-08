@@ -49,3 +49,6 @@ Put mail.py into /mnt/sda1
 7. Collaberate with Pixy Pan/tilt
 
 8. Real time Smoothie Chart
+
+
+```http://ibuyopenwrt.com/index.php/8-yun-compatible/69-mjpeg-stream-video```
